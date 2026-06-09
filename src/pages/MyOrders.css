@@ -1,0 +1,161 @@
+.my-orders{
+padding:40px 80px;
+background:#f6f6f6;
+min-height:80vh;
+}
+
+.my-orders h2{
+font-size:28px;
+margin-bottom:25px;
+}
+
+/* ORDER CARD */
+
+.order-card{
+background:white;
+padding:25px;
+border-radius:10px;
+margin-bottom:30px;
+box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+
+.order-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.order-header h4{
+color:#6a0dad;
+}
+
+.status{
+color:green;
+font-weight:600;
+}
+
+/* PRODUCT LIST */
+
+.order-products{
+margin-top:20px;
+}
+
+/* PRODUCT ROW */
+
+.product-row{
+display:flex;
+align-items:center;
+justify-content: space-between;
+gap:25px;
+padding:15px 0;
+border-top:1px solid #eee;
+}
+
+/* PRODUCT IMAGE */
+
+.product-row img{
+width:70px;
+height:90px;
+object-fit:cover;
+border-radius:6px;
+}
+
+/* PRODUCT INFO */
+
+.product-info{
+min-width:220px;
+}
+
+.product-name{
+font-weight:600;
+font-size:16px;
+}
+
+.product-qty{
+font-size:14px;
+color:#666;
+margin-top:3px;
+}
+
+/* ORDER STATUS */
+
+.order-status{
+min-width:180px;
+font-size:18px;
+}
+
+.delivered{
+color:green;
+font-weight:700;
+margin-bottom:6px;
+}
+
+.payment-mode{
+color:#444;
+margin-bottom:6px;
+}
+
+.return-info{
+color:#8e44ad;
+font-weight:700;
+}
+
+/* RATING SECTION */
+
+.rating-box{
+display:flex;
+/*flex-direction:column;*/
+gap:8px;
+align-items:center;
+}
+
+.rating-box p{
+font-size:18px;
+margin-bottom:5px;
+}
+
+/* STARS */
+
+.star{
+font-size:26px;
+cursor:pointer;
+margin:2px;
+opacity:0.5;
+transition:0.2s;
+}
+
+.star:hover{
+transform:scale(1.2);
+}
+
+.star.active{
+opacity:1;
+color:#ee9609;
+}
+
+.star.locked{
+cursor:not-allowed;
+opacity:1;
+}
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.product-row{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.order-status{
+margin-top:10px;
+}
+
+.rating-box{
+align-items:flex-start;
+margin-top:10px;
+}
+
+}

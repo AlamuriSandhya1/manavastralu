@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Playfair+Display:wght@400;600&display=swap');
+
+.topbar {
+  background: linear-gradient(90deg, #f5ede0 0%, #fdf6ee 40%, #fdf6ee 60%, #f5ede0 100%);
+  border-top: 2px solid #8b5c2a;
+  border-bottom: 1px solid #c8a97a;
+  overflow: hidden;
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  height: 38px;
+}
+
+.topbar-floral {
+  flex-shrink: 0;
+  color: #7a4520;
+  font-size: 14px;
+  padding: 0 12px;
+  opacity: 0.75;
+}
+
+.marquee-track {
+  flex: 1;
+  overflow: hidden;
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: marquee-scroll 30s linear infinite;
+}
+
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5c3317;
+  letter-spacing: 0.5px;
+  padding: 0 6px;
+}
+
+.marquee-item.telugu {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  color: #8b4513;
+}
+
+.marquee-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c8a97a;
+  margin: 0 14px;
+  flex-shrink: 0;
+}
+
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
