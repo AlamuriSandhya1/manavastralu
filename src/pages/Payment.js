@@ -15,7 +15,6 @@ export default function Payment({ cartItems, setCartItems }) {
   const [error,          setError]          = useState("");
   const [scriptLoaded,   setScriptLoaded]   = useState(false);
 
-  // Load Razorpay SDK
   useEffect(() => {
     if (window.Razorpay) { setScriptLoaded(true); return; }
     const script = document.createElement("script");
@@ -25,24 +24,17 @@ export default function Payment({ cartItems, setCartItems }) {
     document.body.appendChild(script);
   }, []);
 
-  // Razorpay flow
   const handleRazorpay = () =>
     new Promise(async (resolve, reject) => {
       if (!scriptLoaded) return reject(new Error("Payment SDK not loaded. Please refresh."));
-
       let orderData;
       try {
-        // ✅ Create Razorpay order
-        const { data } = await axios.post(`${BASE}/api/payment/create-order`, {
-          amount: finalTotal,
-        });
+        const { data } = await axios.post(`${BASE}/api/payment/create-order`, { amount: finalTotal });
         orderData = data;
       } catch (err) {
-        // ✅ Show actual error instead of generic message
         const msg = err.response?.data?.message || err.message || "Could not create payment order.";
         return reject(new Error(msg));
       }
-
       const options = {
         key:         orderData.key,
         amount:      orderData.amount,
@@ -71,15 +63,11 @@ export default function Payment({ cartItems, setCartItems }) {
         },
         modal: { ondismiss: () => reject(new Error("Payment cancelled by user")) },
       };
-
       const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", (resp) =>
-        reject(new Error(resp.error?.description || "Payment failed"))
-      );
+      rzp.on("payment.failed", (resp) => reject(new Error(resp.error?.description || "Payment failed")));
       rzp.open();
     });
 
-  // Main pay handler
   const handlePay = async () => {
     if (!selectedMethod) { setError("Please select a payment method."); return; }
     if (selectedMethod === "online" && !selectedOnline) {
@@ -100,10 +88,8 @@ export default function Payment({ cartItems, setCartItems }) {
         razorpayId = await handleRazorpay();
       }
 
-      // ✅ Send checkoutAddress EXACTLY as-is — don't restructure
       const addressToSend = checkoutAddress || {};
 
-      // ✅ Build products array with correct field names
       const products = cartItems.map(item => {
         const rawImg = item.images?.[0] || item.image || "";
         const imageUrl = rawImg.startsWith("http") ? rawImg
@@ -121,13 +107,12 @@ export default function Payment({ cartItems, setCartItems }) {
         };
       });
 
-      // ✅ POST to /add-order — the route that exists in your backend
       const orderPayload = {
         user_id:        userEmail,
         email:          userEmail,
         userName,
         phone:          addressToSend.phone || "",
-        address:        addressToSend,        // full object with fullName/houseNo/village etc.
+        address:        addressToSend,
         payment_method: payType,
         paymentMethod:  payType,
         total_amount:   Number(finalTotal),
@@ -153,7 +138,6 @@ export default function Payment({ cartItems, setCartItems }) {
       } else {
         setError(res.data.error || "Order could not be placed. Please try again.");
       }
-
     } catch (err) {
       if (err.message === "Payment cancelled by user") {
         setError("Payment was cancelled. Please try again.");
@@ -165,7 +149,6 @@ export default function Payment({ cartItems, setCartItems }) {
     }
   };
 
-  // Image helper
   const getItemImg = (item) => {
     const img = item.images?.[0] || "";
     if (!img) return "/images/s1.png";
@@ -180,7 +163,7 @@ export default function Payment({ cartItems, setCartItems }) {
 
         {/* Header */}
         <div style={s.header}>
-          <div style={s.lockRing}>🔒</div>
+          <div style={s.lockRing}></div>
           <h2 style={s.title}>Secure Checkout</h2>
           <div style={s.amountBadge}>₹{Number(finalTotal || 0).toLocaleString("en-IN")}</div>
           <p style={s.brand}>Mana Vastralu</p>
@@ -216,8 +199,8 @@ export default function Payment({ cartItems, setCartItems }) {
             {checkoutAddress?.fullName && (
               <div style={{ marginTop:8, paddingTop:8, borderTop:"1px dashed #e8d8c4",
                             fontSize:11, color:"#9a7050" }}>
-                📍 <strong style={{ color:"#5c3317" }}>{checkoutAddress.fullName}</strong>
-                {checkoutAddress.phone && ` · ${checkoutAddress.phone}`}<br />
+                 <strong style={{ color:"#5c3317" }}>{checkoutAddress.fullName}</strong>
+                {checkoutAddress.phone && ` · ${checkoutAddress.phone}`}<br/>
                 {[checkoutAddress.houseNo, checkoutAddress.landmark,
                   checkoutAddress.village, checkoutAddress.district,
                   checkoutAddress.state, checkoutAddress.pincode
@@ -230,29 +213,52 @@ export default function Payment({ cartItems, setCartItems }) {
         {/* Error */}
         {error && (
           <div style={s.errorBox}>
-            <span>⚠️</span>
-            <span>{error}</span>
+            <span></span><span>{error}</span>
           </div>
         )}
 
         <p style={s.sectionLabel}>Choose Payment Method</p>
 
-        <PayOption icon="🚚" title="Cash on Delivery"
-          sub="Pay when your order arrives"
-          active={selectedMethod === "cod"}
-          onClick={() => { setSelectedMethod("cod"); setSelectedOnline(""); setError(""); }} />
+        {/* ✅ COD — visible but DISABLED */}
+        <div style={{
+          ...s.option,
+          opacity: 0.45,
+          cursor: "not-allowed",
+          background: "#f9f9f9",
+          border: "1.5px solid #e5e7eb",
+          position: "relative",
+        }}>
+          <span style={s.optIcon}></span>
+          <div style={{ flex:1 }}>
+            <div style={{ ...s.optTitle, color:"#999" }}>Cash on Delivery</div>
+            <div style={{ ...s.optSub, color:"#bbb" }}>Currently unavailable</div>
+          </div>
+          {/* "Not available" badge */}
+          <span style={{
+            fontSize:9, fontWeight:700, color:"#fff",
+            background:"#9ca3af", padding:"3px 8px",
+            borderRadius:20, letterSpacing:"0.5px",
+            textTransform:"uppercase", flexShrink:0,
+          }}>
+            Unavailable
+          </span>
+        </div>
 
-        <PayOption icon="💳" title="Online Payment"
+        {/* ✅ Online Payment — active */}
+        <PayOption
+          icon=""
+          title="Online Payment"
           sub="UPI · Cards · Net Banking · Wallets"
           active={selectedMethod === "online"}
-          onClick={() => { setSelectedMethod("online"); setError(""); }} />
+          onClick={() => { setSelectedMethod("online"); setError(""); }}
+        />
 
         {selectedMethod === "online" && (
           <div style={s.subWrap}>
             {[
-              { value:"UPI / PhonePe / GPay", label:"UPI / PhonePe / GPay", icon:"📱" },
-              { value:"Debit/Credit Card",    label:"Debit / Credit Card",   icon:"💳" },
-              { value:"Net Banking",          label:"Net Banking",           icon:"🏦" },
+              { value:"UPI / PhonePe / GPay", label:"UPI / PhonePe / GPay", icon:"" },
+              { value:"Debit/Credit Card",    label:"Debit / Credit Card",   icon:"" },
+              { value:"Net Banking",          label:"Net Banking",           icon:"" },
             ].map(opt => (
               <div key={opt.value}
                 style={{ ...s.subRow, ...(selectedOnline === opt.value ? s.subRowActive : {}) }}
@@ -272,13 +278,11 @@ export default function Payment({ cartItems, setCartItems }) {
                    cursor:  (loading || !scriptLoaded) ? "not-allowed" : "pointer" }}>
           {loading
             ? <><Spinner /> Placing Order…</>
-            : selectedMethod === "cod"
-              ? `Place Order (COD) · ₹${Number(finalTotal || 0).toLocaleString("en-IN")}`
-              : `Pay ₹${Number(finalTotal || 0).toLocaleString("en-IN")} →`
+            : `Pay ₹${Number(finalTotal || 0).toLocaleString("en-IN")} →`
           }
         </button>
 
-        <p style={s.trust}>🛡️ 256-bit SSL · Powered by Razorpay</p>
+        <p style={s.trust}> 256-bit SSL · Powered by Razorpay</p>
       </div>
     </div>
   );
